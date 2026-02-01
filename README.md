@@ -43,6 +43,24 @@ npm run build
 npm run preview
 ```
 
+### 部署到 Vercel
+
+本项目已配置好 Vercel 部署支持:
+
+```bash
+# 方法1: 使用 Vercel CLI
+npm i -g vercel
+vercel login
+vercel
+
+# 方法2: 通过 GitHub
+# 1. 推送代码到 GitHub
+# 2. 在 vercel.com 导入项目
+# 3. Vercel 会自动检测配置并部署
+```
+
+部署后,RSS 订阅源的获取将通过 Vercel Serverless Functions 处理,自动解决 CORS 问题。
+
 ## 📖 使用指南
 
 ### 1. 添加订阅源
@@ -87,8 +105,9 @@ npm run preview
 - **构建工具**: Vite
 - **PWA**: vite-plugin-pwa
 - **数据库**: IndexedDB (Dexie.js)
-- **RSS 解析**: rss-parser
+- **RSS 解析**: rss-parser (Serverless)
 - **日期处理**: dayjs
+- **部署平台**: Vercel (支持 Serverless Functions)
 
 ## 📁 项目结构
 

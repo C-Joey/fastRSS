@@ -1,37 +1,28 @@
 // RSS 解析和管理服务
-import Parser from 'rss-parser';
 import type { Feed, Article, RSSFeed, RSSItem } from '@/types';
 import { db } from './db.service';
 
 class RSSService {
-    private parser: Parser;
-    private proxyUrl = 'https://api.allorigins.win/raw?url=';
-
-    constructor() {
-        this.parser = new Parser({
-            customFields: {
-                item: [
-                    ['media:content', 'media'],
-                    ['content:encoded', 'contentEncoded'],
-                    ['media:thumbnail', 'thumbnail']
-                ]
-            }
-        });
-    }
-
     /**
      * 获取 RSS Feed
      */
     async fetchFeed(feedUrl: string): Promise<RSSFeed> {
         try {
-            const url = this.proxyUrl + encodeURIComponent(feedUrl);
-            const feed = await this.parser.parseURL(url);
+            // 使用 Vercel Serverless Function 作为代理
+            const apiUrl = `${import.meta.env.VITE_API_BASE_URL || '/api'}/rss-proxy?url=${encodeURIComponent(feedUrl)}`;
+            const response = await fetch(apiUrl);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const feed = await response.json();
 
             return {
                 title: feed.title || 'Unknown Feed',
                 description: feed.description,
                 link: feed.link,
-                items: feed.items.map(item => this.parseItem(item))
+                items: feed.items.map((item: any) => this.parseItem(item))
             };
         } catch (error) {
             console.error('Error fetching RSS feed:', error);
@@ -148,7 +139,7 @@ class RSSService {
         const unreadCount = await db.articles
             .where('feedId')
             .equals(feedId)
-            .and(a => !a.isRead)
+            .and((a: Article) => !a.isRead)
             .count();
 
         await db.updateFeed(feedId, {

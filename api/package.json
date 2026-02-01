@@ -1,0 +1,6 @@
+{
+    "dependencies": {
+        "@vercel/node": "^3.0.12",
+        "rss-parser": "^3.13.0"
+    }
+}
